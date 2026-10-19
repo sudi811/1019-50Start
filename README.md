@@ -1,9 +1,9 @@
 # Machine Learning Regression Explorer 🚀
 
-> 中興大學 人工智慧與資安 (L07 50 Startup LR / HW2 WHO Life Expectancy / Boston Housing)  
 > 多元線性迴歸特徵探索、模型評估與即時數值預測互動式 Web 平台
 
-🔗 **GitHub Pages 線上展示網址**：[https://sudi811.github.io/1019-50Start/](https://sudi811.github.io/1019-50Start/)
+Live demo:  
+[https://sudi811.github.io/1019-50Start/](https://sudi811.github.io/1019-50Start/)
 
 ---
 
@@ -17,6 +17,8 @@
 * **模型評估**：
   * $k=2$（R&D + Marketing）達到最低 RMSE `$8,198.80`，解釋力 $R^2 = 94.74\%$。
 * **對應程式**：`main.py`
+
+![50 Startups Regression Explorer](img/startups_demo.png)
 
 ### 2. 🌍 WHO Life Expectancy (全球預期壽命預測)
 * **目標變數**：`Life expectancy` (平均預期壽命，歲)
@@ -33,6 +35,8 @@
   * 逐步特徵加入順序中，$k=7$ 特徵時達到 5-Fold CV 泛化誤差最低（$4.94$ 歲），測試集 $R^2 = 76.32\%$。
 * **對應程式**：`hw2.py`
 
+![WHO Life Expectancy Regression Explorer](img/who_demo.png)
+
 ### 3. 🏡 Boston Housing (波士頓房價中位數預測)
 * **目標變數**：`MEDV` (房價中位數，千美元 / $1,000s)
 * **特徵 (8 項)**：
@@ -47,6 +51,8 @@
 * **模型評估**：
   * $k=5$ 納入 `LSTAT, RM, PTRATIO, DIS, NOX` 時達到測試集最低 RMSE $5.020$（約 $\$5,020$ 美元），$R^2 = 65.64\%$。
 * **對應程式**：`DICBoston.py`
+
+![Boston Housing Price Regression Explorer](img/boston_demo.png)
 
 ---
 
@@ -63,35 +69,4 @@
 * `boston_result.png`：Boston Housing 評估結果圖表
 * `Life_Expectancy_Data.csv`：WHO 全球 193 國健康與經濟原始資料
 * `BostonHousing.csv`：波士頓 506 區房價原始資料
-
----
-
-## 🚀 本地執行方式
-
-### 1. 執行各作業 Python 分析腳本
-```bash
-# 50 Startups 獲利分析
-python main.py
-
-# WHO 預期壽命分析 (HW2)
-python hw2.py
-
-# Boston 房價分析
-python DICBoston.py
-```
-
-### 2. 開啟互動式三大資料集網站
-直接在瀏覽器雙擊開啟 `index.html`，或使用 Python 伺服器：
-```bash
-python -m http.server 8080
-```
-在瀏覽器造訪 `http://localhost:8080`。
-
----
-
-## 🌐 GitHub Pages 部署
-
-本專案支援純靜態託管：
-1. 進入儲存庫設定：[https://github.com/sudi811/1019-50Start/settings/pages](https://github.com/sudi811/1019-50Start/settings/pages)
-2. 在 **Branch** 選取 `main` / `/(root)` 並點擊 **Save**。
-3. 即可在 [https://sudi811.github.io/1019-50Start/](https://sudi811.github.io/1019-50Start/) 線上操作！
+* `img/`：三大資料集網頁展示截圖目錄
