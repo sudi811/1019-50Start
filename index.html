@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>50 Startups Regression Explorer | 線性迴歸特徵探索與獲利預測</title>
+  <meta name="description" content="以完整 Scikit-learn 模型評估方案，探索 1~5 個特徵對於新創公司獲利的影響，比較最佳模型、檢視 RMSE / R²，並即時預測新創獲利。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN for interactive charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Hero Banner Card -->
+    <header class="hero-card">
+      <div class="hero-header-top">
+        <div class="badge-tag">AI & Machine Learning Lab</div>
+        <div class="repo-link">
+          <a href="https://github.com/sudi811/1019-50Start" target="_blank" rel="noopener noreferrer">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            GitHub Repo
+          </a>
+        </div>
+      </div>
+      <h1 class="hero-title">50 Startups <span class="highlight-text">Regression Explorer</span></h1>
+      <p class="hero-subtitle">
+        以完整 Scikit-learn 模型評估方案，探索 1~5 個特徵對於新創公司獲利的影響，比較最佳模型、檢視 RMSE / R²，並即時預測新創獲利。
+      </p>
+
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">50</div>
+          <div class="stat-label">STARTUPS</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">5</div>
+          <div class="stat-label">PREDICTORS (ML READY)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">155</div>
+          <div class="stat-label">MODEL EXPERIMENTS</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">5-FOLD</div>
+          <div class="stat-label">CROSS VALIDATION</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace Section -->
+    <main class="main-card">
+      <div class="card-header">
+        <div class="title-with-pill">
+          <span class="step-indicator">BEST MODEL SELECTION</span>
+          <h2>探索模型與特徵數量</h2>
+        </div>
+        <div class="header-extra-info">
+          <span class="info-badge">Dataset: 50_Startups.csv</span>
+          <span class="info-badge">Test Size: 20%</span>
+        </div>
+      </div>
+
+      <!-- Controls Row -->
+      <div class="controls-row">
+        <!-- Regression Method Dropdown -->
+        <div class="control-group">
+          <label for="methodSelect" class="control-label">Regression Method</label>
+          <div class="select-wrapper">
+            <select id="methodSelect" class="form-select">
+              <option value="Ridge">Ridge (L2 正則化)</option>
+              <option value="Linear Regression" selected>Linear Regression (多元線性迴歸)</option>
+              <option value="Lasso">Lasso (L1 正則化)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Number of Features (k) Buttons -->
+        <div class="control-group">
+          <label class="control-label">Number of Features (k)</label>
+          <div class="segmented-control" id="kControlGroup">
+            <button class="seg-btn" data-k="1">1</button>
+            <button class="seg-btn active" data-k="2">2</button>
+            <button class="seg-btn" data-k="3">3</button>
+            <button class="seg-btn" data-k="4">4</button>
+            <button class="seg-btn" data-k="5">5</button>
+          </div>
+        </div>
+
+        <!-- Experiment Setting Toggle -->
+        <div class="control-group">
+          <label class="control-label">特徵選擇策略模式</label>
+          <div class="segmented-control-mini" id="modeControlGroup">
+            <button class="seg-mini-btn active" data-mode="stepwise" title="符合課堂實作之逐步加入特徵順序">逐步選取 (Stepwise)</button>
+            <button class="seg-mini-btn" data-mode="exhaustive" title="以 5-Fold CV 尋找各特徵數量最佳組合">5-Fold CV 最佳組合</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 KPI Metric Cards -->
+      <div class="metrics-grid">
+        <div class="metric-card" id="cardRmse">
+          <div class="metric-header">
+            <span class="metric-title">TEST RMSE</span>
+            <span class="metric-icon">📉</span>
+          </div>
+          <div class="metric-value" id="valRmse">$8,198.80</div>
+          <div class="metric-desc">Root Mean Squared Error (越低越佳)</div>
+          <div class="metric-trend positive" id="trendRmse">⭐ 測試集最優表現</div>
+        </div>
+
+        <div class="metric-card" id="cardR2">
+          <div class="metric-header">
+            <span class="metric-title">TEST R²</span>
+            <span class="metric-icon">🎯</span>
+          </div>
+          <div class="metric-value" id="valR2">0.9474</div>
+          <div class="metric-desc">判定係數 (解釋變異百分比)</div>
+          <div class="metric-trend positive" id="trendR2">⭐ 達到 94.74% 解釋力</div>
+        </div>
+
+        <div class="metric-card" id="cardMae">
+          <div class="metric-header">
+            <span class="metric-title">TEST MAE</span>
+            <span class="metric-icon">📏</span>
+          </div>
+          <div class="metric-value" id="valMae">$6,886.59</div>
+          <div class="metric-desc">平均絕對誤差 (實際金額落差)</div>
+          <div class="metric-trend neutral" id="trendMae">預測平均落差約 $6.8k</div>
+        </div>
+
+        <div class="metric-card" id="cardCvRmse">
+          <div class="metric-header">
+            <span class="metric-title">5-FOLD CV RMSE</span>
+            <span class="metric-icon">🔄</span>
+          </div>
+          <div class="metric-value" id="valCvRmse">$9,883.42</div>
+          <div class="metric-desc">訓練集 5-Fold 交叉驗證誤差</div>
+          <div class="metric-trend neutral" id="trendCvRmse">泛化評估指標</div>
+        </div>
+      </div>
+
+      <!-- Selected Predictors Tag Section -->
+      <div class="predictors-panel">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <span class="panel-title">Selected Predictors</span>
+            <span class="panel-subtitle">當前模型納入之自變數與特徵係數 (Weights)</span>
+          </div>
+          <span class="badge-count" id="predictorCountBadge">2 Features</span>
+        </div>
+        <div class="tags-container" id="predictorTags">
+          <!-- Dynamic Pills will be injected here -->
+        </div>
+      </div>
+
+      <!-- Performance Charts Section -->
+      <div class="charts-section">
+        <div class="charts-header">
+          <h3 id="chartSectionTitle">Linear Regression - Feature Count Performance</h3>
+          <p class="chart-subtitle">特徵數量 (1~5) 對模型評估指標 RMSE 與 R² 之折線走勢分析</p>
+        </div>
+        <div class="charts-grid">
+          <!-- RMSE Chart Box -->
+          <div class="chart-box">
+            <div class="chart-top-bar">
+              <span class="chart-label">RMSE by Number of Features</span>
+              <span class="chart-unit">單位: 美元 ($)</span>
+            </div>
+            <div class="canvas-wrapper">
+              <canvas id="rmseChart"></canvas>
+            </div>
+          </div>
+
+          <!-- R-squared Chart Box -->
+          <div class="chart-box">
+            <div class="chart-top-bar">
+              <span class="chart-label">R-squared by Number of Features</span>
+              <span class="chart-unit">範圍: 0 ~ 1.0</span>
+            </div>
+            <div class="canvas-wrapper">
+              <canvas id="r2Chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time Interactive Simulator Section -->
+      <section class="simulator-card">
+        <div class="simulator-header">
+          <div class="sim-title-group">
+            <span class="sim-badge">LIVE SIMULATOR</span>
+            <h3>新創公司獲利即時預測計算機</h3>
+            <p>調動下方新創公司的投入經費與地區，即時以目前選定的多元線性迴歸模型推估淨獲利 (Profit)：</p>
+          </div>
+          <div class="prediction-result-box">
+            <div class="pred-label">ESTIMATED PROFIT (推估淨利)</div>
+            <div class="pred-number" id="predProfitValue">$118,520</div>
+            <div class="pred-formula" id="predFormulaText">Profit = 46,346 + 0.789 × R&D + 0.033 × Marketing</div>
+          </div>
+        </div>
+
+        <div class="simulator-inputs-grid">
+          <!-- R&D Spend -->
+          <div class="input-card">
+            <div class="input-title-row">
+              <label for="rangeRD">🔬 研發支出 (R&D Spend)</label>
+              <span class="val-bubble" id="labelRD">$80,000</span>
+            </div>
+            <input type="range" id="rangeRD" min="0" max="200000" step="1000" value="80000" class="custom-range">
+            <div class="range-scale">
+              <span>$0</span>
+              <span>$100,000</span>
+              <span>$200,000</span>
+            </div>
+          </div>
+
+          <!-- Administration -->
+          <div class="input-card">
+            <div class="input-title-row">
+              <label for="rangeAdmin">💼 行政管理 (Administration)</label>
+              <span class="val-bubble" id="labelAdmin">$120,000</span>
+            </div>
+            <input type="range" id="rangeAdmin" min="50000" max="200000" step="1000" value="120000" class="custom-range">
+            <div class="range-scale">
+              <span>$50,000</span>
+              <span>$125,000</span>
+              <span>$200,000</span>
+            </div>
+          </div>
+
+          <!-- Marketing Spend -->
+          <div class="input-card">
+            <div class="input-title-row">
+              <label for="rangeMkt">📢 行銷經費 (Marketing Spend)</label>
+              <span class="val-bubble" id="labelMkt">$250,000</span>
+            </div>
+            <input type="range" id="rangeMkt" min="0" max="500000" step="5000" value="250000" class="custom-range">
+            <div class="range-scale">
+              <span>$0</span>
+              <span>$250,000</span>
+              <span>$500,000</span>
+            </div>
+          </div>
+
+          <!-- State Selection -->
+          <div class="input-card">
+            <div class="input-title-row">
+              <label>📍 公司註冊州別 (State)</label>
+              <span class="val-bubble" id="labelState">New York</span>
+            </div>
+            <div class="state-buttons" id="stateBtnGroup">
+              <button class="state-btn active" data-state="New York">New York</button>
+              <button class="state-btn" data-state="California">California</button>
+              <button class="state-btn" data-state="Florida">Florida</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Experiment Leaderboard Table -->
+      <section class="table-section">
+        <div class="table-header">
+          <h3>📊 實驗特徵選擇評估彙總表 (Feature Selection Summary)</h3>
+          <p>比對 1 ~ 5 個特徵在當前設定下的 RMSE 與 R² 評估指標：</p>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table" id="summaryTable">
+            <thead>
+              <tr>
+                <th>Features (k)</th>
+                <th>Selected Features (選取特徵組合)</th>
+                <th>Test RMSE ($)</th>
+                <th>Test R-squared (R²)</th>
+                <th>Test MAE ($)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="summaryTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 50 Startups Raw Data Explorer -->
+      <section class="table-section raw-data-section">
+        <div class="table-header">
+          <div class="title-with-search">
+            <h3>📑 50 Startups 原始資料集檢視 (Raw Dataset)</h3>
+            <input type="text" id="tableSearchInput" placeholder="搜尋公司州別或金額..." class="search-box">
+          </div>
+          <p>共 50 筆新創公司支出與利潤資料：</p>
+        </div>
+        <div class="table-responsive table-scroll">
+          <table class="data-table" id="rawDataTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>R&D Spend</th>
+                <th>Administration</th>
+                <th>Marketing Spend</th>
+                <th>State</th>
+                <th>Profit (Target)</th>
+              </tr>
+            </thead>
+            <tbody id="rawDataTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-content">
+        <p><strong>50 Startups Regression Explorer</strong> • 中興大學 人工智慧與資安 (L07 50 Startup LR)</p>
+        <p class="sub-text">使用 Scikit-Learn、Pandas、Chart.js 構建 • 可一鍵發佈於 GitHub Pages</p>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
