@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Machine Learning Regression Explorer | 線性迴歸特徵探索與預測平台</title>
-  <meta name="description" content="支援 50 Startups 與 WHO Life Expectancy 兩大資料集之多元線性迴歸評估、逐步特徵選擇、折線圖指標分析與即時預測模擬器。">
+  <meta name="description" content="多資料集線性迴歸特徵探索平台：50 Startups、WHO Life Expectancy 與 Boston Housing，支援逐步特徵選擇、指標評估與即時獲利/房價/壽命模擬預測。">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -13,23 +13,44 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Top Navigation & Dataset Selector Bar (Placed at the very top of the page) -->
+  <nav class="top-nav-bar">
+    <div class="nav-inner">
+      <div class="nav-dataset-group">
+        <label for="datasetSelect" class="nav-label">
+          <span class="pulse-icon"></span> 選擇分析資料集 (DATASET):
+        </label>
+        <div class="select-wrapper nav-select-wrap">
+          <select id="datasetSelect" class="nav-dropdown">
+            <option value="startups" selected>🏢 50 Startups (新創獲利預測 - 5 Features)</option>
+            <option value="who_life_expectancy">🌍 WHO Life Expectancy (全球預期壽命 - 8 Features)</option>
+            <option value="boston">🏡 Boston Housing (波士頓房價預測 - 8 Features)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="nav-right-group">
+        <span class="course-tag">中興大學 人工智慧與資安</span>
+        <a href="https://github.com/sudi811/1019-50Start" target="_blank" rel="noopener noreferrer" class="nav-github-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </nav>
+
   <div class="app-container">
-    <!-- Top Hero Banner Card -->
+    <!-- Hero Banner Card (Original 50 Startups Style) -->
     <header class="hero-card">
       <div class="hero-header-top">
         <div class="badge-tag" id="heroBadgeTag">AI & Machine Learning Lab</div>
-        <div class="repo-link">
-          <a href="https://github.com/sudi811/1019-50Start" target="_blank" rel="noopener noreferrer">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-            GitHub Repo
-          </a>
-        </div>
+        <div class="target-indicator" id="heroTargetIndicator">Target Variable: Profit ($)</div>
       </div>
       <h1 class="hero-title" id="heroTitle">
         <span id="heroTitlePrefix">50 Startups</span> <span class="highlight-text" id="heroTitleSuffix">Regression Explorer</span>
       </h1>
       <p class="hero-subtitle" id="heroSubtitle">
-        以完整 Scikit-learn 模型評估方案，探索特徵對於目標變數的影響，比較最佳模型、檢視 RMSE / R²，並即時預測目標數值。
+        以完整 Scikit-learn 模型評估方案，探索 1~5 個特徵對於新創公司獲利的影響，比較最佳模型、檢視 RMSE / R²，並即時預測新創獲利。
       </p>
 
       <div class="stats-grid">
@@ -39,11 +60,11 @@
         </div>
         <div class="stat-item">
           <div class="stat-number" id="statFeatures">5</div>
-          <div class="stat-label">PREDICTORS (ML READY)</div>
+          <div class="stat-label" id="statFeaturesLabel">PREDICTORS (ML READY)</div>
         </div>
         <div class="stat-item">
           <div class="stat-number" id="statExperiments">155</div>
-          <div class="stat-label">MODEL COMBINATIONS</div>
+          <div class="stat-label" id="statExperimentsLabel">MODEL COMBINATIONS</div>
         </div>
         <div class="stat-item">
           <div class="stat-number">5-FOLD</div>
@@ -54,19 +75,13 @@
 
     <!-- Main Workspace Section -->
     <main class="main-card">
-      <!-- Dataset Selector Bar (Dropdown) -->
-      <div class="dataset-bar">
-        <div class="dataset-select-group">
-          <label for="datasetSelect" class="dataset-select-label">
-            <span class="pulse-icon"></span> 選擇分析資料集 (SELECT DATASET)
-          </label>
-          <select id="datasetSelect" class="form-select dataset-dropdown">
-            <option value="startups" selected>🏢 50 Startups (新創獲利預測 - 5 Features)</option>
-            <option value="who_life_expectancy">🌍 WHO Life Expectancy (全球預期壽命預測 - 8 Features)</option>
-          </select>
+      <div class="card-header">
+        <div class="title-with-pill">
+          <span class="step-indicator">BEST MODEL SELECTION</span>
+          <h2>探索模型與特徵數量</h2>
         </div>
         <div class="header-extra-info">
-          <span class="info-badge" id="badgeTarget">Target: Profit ($)</span>
+          <span class="info-badge" id="badgeDatasetName">Dataset: 50_Startups.csv</span>
           <span class="info-badge">Test Size: 20%</span>
           <span class="info-badge">5-Fold CV</span>
         </div>
@@ -86,15 +101,17 @@
           </div>
         </div>
 
-        <!-- Number of Features (k) Buttons (Populated dynamically) -->
+        <!-- Number of Features (k) Interactive Segmented Buttons -->
         <div class="control-group">
-          <label class="control-label">Number of Features (k)</label>
+          <label class="control-label">
+            Number of Features (k): <span class="active-k-badge" id="activeKLabel">2</span>
+          </label>
           <div class="segmented-control" id="kControlGroup">
-            <!-- Buttons injected dynamically -->
+            <!-- Buttons injected dynamically: [1][2][3][4][5] or [1]~[8] -->
           </div>
         </div>
 
-        <!-- Experiment Setting Toggle -->
+        <!-- Strategy Mode Toggle -->
         <div class="control-group">
           <label class="control-label">特徵選擇策略模式</label>
           <div class="segmented-control-mini" id="modeControlGroup">
@@ -132,8 +149,8 @@
             <span class="metric-icon">📏</span>
           </div>
           <div class="metric-value" id="valMae">$6,886.59</div>
-          <div class="metric-desc" id="descMae">平均絕對誤差 (實際落差)</div>
-          <div class="metric-trend neutral" id="trendMae">平均落差指標</div>
+          <div class="metric-desc" id="descMae">平均絕對誤差 (實際金額落差)</div>
+          <div class="metric-trend neutral" id="trendMae">預測平均落差指標</div>
         </div>
 
         <div class="metric-card" id="cardCvRmse">
@@ -201,15 +218,15 @@
             <p id="simDesc">調動下方特徵數值，即時以目前選定的多元線性迴歸模型推估目標數值：</p>
           </div>
           <div class="prediction-result-box">
-            <div class="pred-label" id="simResultLabel">ESTIMATED PROFIT (推估獲利)</div>
+            <div class="pred-label" id="simResultLabel">ESTIMATED PROFIT (推估淨利)</div>
             <div class="pred-number" id="predOutputValue">$118,520</div>
             <div class="pred-formula" id="predFormulaText">Profit = 46,346 + 0.789 × R&D + 0.033 × Marketing</div>
           </div>
         </div>
 
-        <!-- Simulator Inputs (Populated dynamically according to dataset) -->
+        <!-- Simulator Inputs (Populated dynamically) -->
         <div class="simulator-inputs-grid" id="simulatorInputsGrid">
-          <!-- Dynamic controls -->
+          <!-- Dynamic Controls -->
         </div>
       </section>
 
@@ -263,8 +280,8 @@
     <!-- Footer -->
     <footer class="app-footer">
       <div class="footer-content">
-        <p><strong>Machine Learning Regression Explorer</strong> • 中興大學 人工智慧與資安 (L07 / HW2)</p>
-        <p class="sub-text">50 Startups & WHO Life Expectancy • Python Scikit-Learn • GitHub Pages</p>
+        <p><strong>Machine Learning Regression Explorer</strong> • 中興大學 人工智慧與資安 (L07 / HW2 / Boston)</p>
+        <p class="sub-text">50 Startups • WHO Life Expectancy • Boston Housing • Scikit-Learn • GitHub Pages</p>
       </div>
     </footer>
   </div>
